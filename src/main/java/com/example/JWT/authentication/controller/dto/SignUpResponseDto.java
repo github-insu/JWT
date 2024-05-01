@@ -6,5 +6,6 @@ import lombok.Builder;
 public record SignUpResponseDto(
         Boolean success,
         String message
+
 ) {
 }

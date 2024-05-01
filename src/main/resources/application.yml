@@ -4,9 +4,9 @@ spring:
 
   datasource:
     driver-class-name: org.h2.Driver
-    url: ${DB_URL:jdbc:h2:mem:testdb}
+    url: ${DB_URL:jdbc:h2:~/Desktop/Git/Feature/JWT/h2/test}  #jdbc:h2:mem:testdb
     username: ${DB_USERNAME:sa}
-    password: ${DB_PASSWORD:}
+    password: ${DB_PASSWORD:jwt}
 
   jpa:
     properties:
