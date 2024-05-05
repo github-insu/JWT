@@ -1,3 +1,25 @@
 spring:
   application:
     name: JWT
+
+  config:
+    import:
+      - classpath:/app/jwt/jwt.yml
+
+  datasource:
+    driver-class-name: org.h2.Driver
+    url: ${DB_URL:jdbc:h2:~/Desktop/Git/Feature/JWT/h2/test}  #jdbc:h2:mem:testdb
+    username: ${DB_USERNAME:sa}
+    password: ${DB_PASSWORD:jwt}
+
+  jpa:
+    properties:
+      hibernate:
+        format_sql: true
+        dialect: org.hibernate.dialect.H2Dialect
+    show-sql: true
+    hibernate:
+      ddl-auto: none
+
+    flyway:
+      baseline-on-migration: true
