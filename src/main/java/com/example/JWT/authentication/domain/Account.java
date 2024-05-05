@@ -15,12 +15,12 @@ import java.time.Instant;
 public class Account {
 
     @Id
-    String userEmail;
-    String userName;
-    String password;
-    String nickname;
+    public String userEmail;
+    public String userName;
+    public String password;
+    public String nickname;
     @Enumerated(EnumType.STRING)
-    AccountStatus status;
-    Instant createdAt;
-    Instant updatedAt;
+    public AccountStatus status;
+    public Instant createdAt;
+    public Instant updatedAt;
 }

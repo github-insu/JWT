@@ -1,21 +1,23 @@
 package com.example.JWT.authentication.service;
 
-import com.example.JWT.authentication.controller.dto.SignInRequestDto;
-import com.example.JWT.authentication.controller.dto.SignInResponseDto;
 import com.example.JWT.authentication.controller.dto.SignUpRequestDto;
 import com.example.JWT.authentication.domain.Account;
 import com.example.JWT.authentication.domain.types.AccountStatus;
-import com.example.JWT.authentication.mapper.AccountDetailedViewProjectionMapper;
+import com.example.JWT.authentication.dto.JwtAuthenticationToken;
+import com.example.JWT.authentication.mapper.LoginAccountProjectionMapper;
 import com.example.JWT.authentication.mapper.SignUpDtoMapper;
 import com.example.JWT.authentication.repository.AccountRepository;
-import com.example.JWT.authentication.repository.projection.AccountDetailedViewProjection;
+import com.example.JWT.authentication.repository.projection.LoginAccountProjection;
 import com.example.JWT.authentication.usecase.SignInUseCase;
 import com.example.JWT.authentication.usecase.SignUpUseCase;
+import com.example.JWT.common.support.JwtProvider;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.time.Instant;
-import java.util.Optional;
+import java.util.HashMap;
+import java.util.Map;
 
 @Service
 @RequiredArgsConstructor
@@ -23,10 +25,15 @@ public class AuthenticationService implements SignUpUseCase, SignInUseCase {
 
     private final AccountRepository accountRepository;
     private final SignUpDtoMapper singUpMapper;
-    private final AccountDetailedViewProjectionMapper projectionMapper;
+    private final LoginAccountProjectionMapper projectionMapper;
+    private final JwtProvider jwtProvider;
+    private final PasswordEncoder passwordEncoder;
+
 
     @Override
     public Account signUp(Account account) {
+
+        account.password = passwordEncoder.encode(account.password);
         return accountRepository.save(account);
     }
 
@@ -38,10 +45,26 @@ public class AuthenticationService implements SignUpUseCase, SignInUseCase {
     }
 
     @Override
-    public SignInResponseDto signIn(SignInRequestDto dto) {
-        AccountDetailedViewProjection projection = accountRepository.findDetailedViewByUserEmail(dto.userEmail())
-                .orElseThrow(() -> { throw new IllegalArgumentException("입력을 확인해주세요."); });
+    public JwtAuthenticationToken signIn(String userEmail, String password) {
+        LoginAccountProjection projection = accountRepository
+                .findDetailedViewByUserEmail(userEmail)
+                .orElseThrow(() -> new RuntimeException("입력을 확인해주세요."));
 
-        return projectionMapper.toDto(projection);
+        boolean isMatched = passwordEncoder.matches(password, projection.password());
+
+        if (!isMatched) {
+            throw new RuntimeException("입력을 확인해주세요.");
+        }
+
+        Map<String, Object> claims = new HashMap<>();
+        claims.put("nickname", projection.nickname());
+        claims.put("authority", "USER");
+
+        String accessToken = jwtProvider.generateJwt(userEmail, claims);
+
+        return JwtAuthenticationToken.builder()
+                .accessToken(accessToken)
+                .refreshToken("...")
+                .build();
     }
 }

@@ -1,8 +1,7 @@
 package com.example.JWT.authentication.usecase;
 
-import com.example.JWT.authentication.controller.dto.SignInRequestDto;
-import com.example.JWT.authentication.controller.dto.SignInResponseDto;
+import com.example.JWT.authentication.dto.JwtAuthenticationToken;
 
 public interface SignInUseCase {
-    SignInResponseDto signIn(SignInRequestDto dto);
+    JwtAuthenticationToken signIn(String userEmail, String password);
 }

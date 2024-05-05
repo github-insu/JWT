@@ -2,6 +2,10 @@ spring:
   application:
     name: JWT
 
+  config:
+    import:
+      - classpath:/app/jwt/jwt.yml
+
   datasource:
     driver-class-name: org.h2.Driver
     url: ${DB_URL:jdbc:h2:~/Desktop/Git/Feature/JWT/h2/test}  #jdbc:h2:mem:testdb
